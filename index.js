@@ -1,6 +1,15 @@
 require('dotenv').config()
 const { GoogleSpreadsheet } = require('google-spreadsheet')
+const functions = require('firebase-functions');
+const admin=require('firebase-admin')
 const doc = new GoogleSpreadsheet(process.env.SHEET_ID);
+const serviceAccount = require("./serviceKey.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: process.env.DATABASE_URL
+});
+const db=admin.database()
+
 let checkAndPush=async (doc)=>{
   await doc.loadInfo();
   const sheet = doc.sheetsByIndex[0]
@@ -42,6 +51,23 @@ let checkAndPush=async (doc)=>{
   await oldSheet.addRows(newChanges)
   newChanges.forEach(async(el)=>{
     console.log(el)
+    try{
+      const ref=db.ref("en/yokai/"+el.name.toLowerCase())
+      await ref.set({
+        tribe: el.tribe,
+        rank: el.rank,
+        hp: el.hp,
+        atk: el.attack,
+        soult: el.soult,
+        skill: el.skill,
+        gsoult: el.g,
+        img: el.img,
+        series: el.series
+      })
+      console.log("Push success")
+    }catch(err){
+      console.log("Something bad happen.")
+    }
   })
 }
 (async()=>{
