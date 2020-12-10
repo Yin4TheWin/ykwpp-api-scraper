@@ -52,7 +52,7 @@ let checkAndPush=async (doc)=>{
   newChanges.forEach(async(el)=>{
     console.log(el)
     try{
-      const ref=db.ref("en/yokai/"+el.name.toLowerCase().split(" ").join(""))
+      const ref=db.ref("en/yokai/"+el.name.replace(/[^0-9a-z]/gi, '').toLowerCase())
       await ref.set({
         tribe: el.tribe,
         rank: el.rank,
@@ -62,7 +62,8 @@ let checkAndPush=async (doc)=>{
         skill: el.skill,
         gsoult: el.g,
         img: el.img,
-        series: el.series
+        series: el.series,
+        actualName: el.name
       })
       console.log("Push success")
     }catch(err){
