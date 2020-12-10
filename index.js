@@ -1,7 +1,12 @@
 require('dotenv').config()
 const { GoogleSpreadsheet } = require('google-spreadsheet')
 const doc = new GoogleSpreadsheet(process.env.SHEET_ID);
-let checkAndPush=(rows, old)=>{
+let checkAndPush=async (doc)=>{
+  await doc.loadInfo();
+  const sheet = doc.sheetsByIndex[0]
+  const oldSheet = doc.sheetsByIndex[1]
+  const old = await oldSheet.getRows();
+  const rows = await sheet.getRows();
   let newChanges=[]
   //Look at info from previous scrape and remove from current
   // let oldNames=old.map(el=>{
@@ -18,7 +23,7 @@ let checkAndPush=(rows, old)=>{
     })
   })
   console.log("Loaded "+doc.title);
-  rows.forEach(el=>{
+  rows.forEach(async(el)=>{
     let yokaiObj={
       //name rank tribe hp attack soult skill g series
       name: el.name,
@@ -30,20 +35,17 @@ let checkAndPush=(rows, old)=>{
       skill: el.skill,
       g: el.g,
       series: el.series,
-      image: el.img
+      img: el.img
     }
     newChanges.push(yokaiObj)
   })
-  newChanges.forEach(el=>{
+  await oldSheet.addRows(newChanges)
+  newChanges.forEach(async(el)=>{
     console.log(el)
   })
 }
 (async()=>{
   await doc.useServiceAccountAuth(require('./credential.json'))
-  await doc.loadInfo();
-  const sheet = doc.sheetsByIndex[0]
-  const old = await doc.sheetsByIndex[1].getRows();
-  const rows = await sheet.getRows();
-  checkAndPush(rows, old)
-  setInterval(function(){checkAndPush(rows)}, 50000)
+  checkAndPush(doc)
+  setInterval(function(){checkAndPush(doc)}, 60000)
 })()
