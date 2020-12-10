@@ -52,7 +52,7 @@ let checkAndPush=async (doc)=>{
   newChanges.forEach(async(el)=>{
     console.log(el)
     try{
-      const ref=db.ref("en/yokai/"+el.name.toLowerCase())
+      const ref=db.ref("en/yokai/"+el.name.toLowerCase().split(" ").join(""))
       await ref.set({
         tribe: el.tribe,
         rank: el.rank,
