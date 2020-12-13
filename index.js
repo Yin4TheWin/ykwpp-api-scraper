@@ -18,12 +18,6 @@ let checkAndPush=async (doc)=>{
   const rows = await sheet.getRows();
   let newChanges=[]
   //Look at info from previous scrape and remove from current
-  // let oldNames=old.map(el=>{
-  //   return el.name
-  // })
-  // oldNames.forEach(e=>{
-  //   console.log(e)
-  // })
   old.forEach(oldName=>{
     rows.forEach((el,i)=>{
       if(oldName.name===el.name){
