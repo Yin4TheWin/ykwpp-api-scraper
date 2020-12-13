@@ -38,7 +38,8 @@ let checkAndPush=async (doc)=>{
       skill: el.skill,
       g: el.g,
       series: el.series,
-      img: el.img
+      img: el.img,
+      alias: el.alias
     }
     newChanges.push(yokaiObj)
   })
@@ -46,6 +47,7 @@ let checkAndPush=async (doc)=>{
   newChanges.forEach(async(el)=>{
     console.log(el)
     try{
+      let aliases=el.alias.split(", ")
       const ref=db.ref("en/yokai/"+el.name.replace(/[^0-9a-z]/gi, '').toLowerCase())
       await ref.set({
         tribe: el.tribe,
@@ -57,7 +59,8 @@ let checkAndPush=async (doc)=>{
         gsoult: el.g,
         img: el.img,
         series: el.series,
-        actualName: el.name
+        actualName: el.name,
+        alias: aliases
       })
       console.log("Push success")
     }catch(err){
